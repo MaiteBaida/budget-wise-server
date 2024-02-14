@@ -20,7 +20,7 @@ const fetchUser = async (req, res) => {
       });
     }
 }
-
+//expenses list of a specific user
 const userExpenses = async (req, res) => {
     try {
         const userId = req.params.id;
