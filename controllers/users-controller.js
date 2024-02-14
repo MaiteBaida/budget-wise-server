@@ -21,4 +21,21 @@ const fetchUser = async (req, res) => {
     }
 }
 
-module.exports = { fetchUser };
+const userExpenses = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        console.log(userId)
+        const expenses = await knex('expenses')
+            .join('users', 'expenses.user_id', '=', 'users.id')
+            .where({ 'expenses.user_id' : userId })
+            .select('*');
+
+        res.json(expenses);
+    } catch (error) {
+        res.status(500).json({
+            message: `Error retrieving expenses for user: ${error}`,
+        });
+    }
+}
+
+module.exports = { fetchUser, userExpenses };
