@@ -20,6 +20,45 @@ const fetchUser = async (req, res) => {
       });
     }
 }
+
+//add new user function
+const addUser = async (req, res) => {
+    const { username, email, password, first_name, last_name } = req.body;
+
+    if (!username || !email || !password || !first_name || !last_name) {
+        return res.status(400).json({
+            message: 'All fields are required',
+        })
+    }
+    if (!email.includes('@' && '.')) { 
+        return res.status(400).json({
+            message: 'Invalid Email',
+        })
+    } 
+    try {
+        const result = await knex('users').insert({
+            username, 
+            email, 
+            password, 
+            first_name, 
+            last_name,
+        })
+
+        const newUserId = result[0];
+        const createdUser = await knex('users').where({ id: newUserId }).first();
+
+        res.status(201).json({
+            message: 'User created successfully',
+            user: createdUser, // Fix typo here
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: `Unable to create new user: ${error}`,
+        })
+    }
+}
+
 //expenses list of a specific user
 const userExpenses = async (req, res) => {
     try {
@@ -38,4 +77,4 @@ const userExpenses = async (req, res) => {
     }
 }
 
-module.exports = { fetchUser, userExpenses };
+module.exports = { fetchUser, addUser, userExpenses };
