@@ -1,12 +1,21 @@
 const express = require('express');
+const app = express();
 const cors = require('cors');
 
 require('dotenv').config();
 
-const app = express();
+const usersRoutes = require('./routes/users');
+const expensesRoutes = require('./routes/expenses');
 
 app.use(express.json());
 app.use(cors());
+
+app.route('/')
+    .get((_req, res) => {
+        res.json('Welcome to / for BudgetWise');
+})
+
+app.use('/user/:id')
 
 const PORT = process.env.PORT || 8080;
 
