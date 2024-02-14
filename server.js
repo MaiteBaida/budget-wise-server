@@ -15,7 +15,7 @@ app.route('/')
         res.json('Welcome to / for BudgetWise');
 })
 
-app.use('/user/:id')
+app.use('/user/:id', usersRoutes);
 
 const PORT = process.env.PORT || 8080;
 
