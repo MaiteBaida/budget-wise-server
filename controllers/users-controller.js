@@ -1,5 +1,6 @@
 const knex = require('knex')(require('../knexfile'));
 
+//get user by id function
 const fetchUser = async (req, res) => {
     try {
       const userId = await knex('users')
