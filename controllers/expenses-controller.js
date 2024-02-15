@@ -4,7 +4,6 @@ const knex = require('knex')(require('../knexfile'));
 const userExpenses = async (req, res) => {
     try {
         const userId = req.params.userid;
-        console.log(userId)
         const expenses = await knex('expenses')
             .join('users', 'expenses.user_id', '=', 'users.id')
             .select('expenses.*', 'users.username', 'users.email', 'users.first_name', 'users.last_name')
@@ -21,13 +20,11 @@ const userExpenses = async (req, res) => {
 //user add new expense
 const addExpense = async (req, res) => {
     try {
-        console.log('Received expense data:', req.body);
         const { name, estimated_amount, paid_amount, frequency, type, notes } = req.body;
 
-
-        // if(!name || !estimated_amount || !frequency || !type) {
-        //     return res.status(400).json({message:'Must fill in all fields'});
-        // }
+        if(!name || !estimated_amount || !frequency || !type) {
+            return res.status(400).json({message:'Must fill in all fields'});
+        }
 
         const newExpense = {
             name,
@@ -39,17 +36,11 @@ const addExpense = async (req, res) => {
             user_id: req.params.userid 
         }
 
-        console.log('Constructed new expense:', newExpense);
-
         const [insertedExpenseId] = await knex('expenses').insert(newExpense);
 
         const insertedExpense = await knex('expenses').where('id', insertedExpenseId).first();
 
-        console.log('Inserted expense into database:', insertedExpense);
-
         const expenseWithUser = { ...insertedExpense, ...req.user };
-
-        // console.log(expenseWithUser)
 
         res.status(201).json({ message: 'Expense created successfully', expense:  expenseWithUser });
     } catch (error) {
