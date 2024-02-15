@@ -17,6 +17,8 @@ app.route('/')
 
 app.use('/user', usersRoutes);
 
+app.use('/expenses', expensesRoutes);
+
 
 const PORT = process.env.PORT || 8080;
 
