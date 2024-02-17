@@ -1,5 +1,15 @@
 const knex = require('knex')(require('../knexfile'));
 
+//get list of users
+const fetchUsersList = async (_req, res) => {
+  try {
+    const usersList = await knex.select().from('users');
+    res.status(200).json(usersList);
+    } catch (error) {
+        res.status(400).json({ message: 'Error retrieving users', error });
+    }
+}
+
 //get user by id function
 const fetchUser = async (req, res) => {
     try {
@@ -59,4 +69,4 @@ const addUser = async (req, res) => {
     }
 }
 
-module.exports = { fetchUser, addUser };
+module.exports = { fetchUser, addUser, fetchUsersList };

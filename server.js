@@ -16,7 +16,6 @@ app.route('/')
 })
 
 app.use('/user', usersRoutes);
-
 app.use('/user', expensesRoutes);
 
 
