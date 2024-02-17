@@ -32,6 +32,9 @@ const fetchUser = async (req, res) => {
 }
 
 //add new user function
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const addUser = async (req, res) => {
     const { username, email, password, first_name, last_name } = req.body;
 
@@ -40,7 +43,7 @@ const addUser = async (req, res) => {
             message: 'All fields are required',
         })
     }
-    if (!email.includes('@' && '.')) { 
+    if (!emailRegex.test(email)) { 
         return res.status(400).json({
             message: 'Invalid Email',
         })
