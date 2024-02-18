@@ -1,6 +1,7 @@
 const knex = require('knex')(require('../knexfile'));
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { JWT_KEY } = process.env;
 
 //get list of users
 // const fetchUsersList = async (_req, res) => {
@@ -76,56 +77,32 @@ const addUser = async (req, res) => {
 }
 
 //user loggin confirmation
-const loginUser = async (req, res, next) => {
+const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
     const user = await knex('users').where({ username: username }).first();
   
-    if(!user || password !== user.password) {
+    if(!user) {
       res.status(401).json({message:'Unable to login'});
     }
 
-    res.status(200).json({
-      message: 'User logged in successfully', 
-      token
-      })
+    const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+    if(!isPasswordCorrect) {
+      res.status(401).json({message:'Unable to login'});
+    }
+   
+    const token = jwt.sign(
+      {first_name: user.first_name, last_name: user.last_name, email: user.email, username: username}, 
+      JWT_KEY
+    )
+
+    return res.status(200).json(token);
 
   } catch (error) {
+    console.error('Error signing JWT:', error);
     res.status(401).json({message:'Unable to login'});
   }
 }
-
-// const loginUser = async (req, res, next) => {
-//   const { username, password } = req.body;
-//   const { authorization } = req.headers;
-
-//   try {
-//     // Attempt to verify the JWT token
-//     const payload = jwt.verify(authorization.split(' ')[1], JWT_KEY);
-//     req.user = payload; // Attach user information to the request object
-//   } catch(err) {
-//     return res.status(401).json("Invalid JWT");
-//   }
-
-//   try {
-//     // Attempt to find the user in the database
-//     const user = await knex('users').where({ username }).first();
-  
-//     // If the user doesn't exist or the password is incorrect, deny access
-//     if (!user || password !== user.password) {
-//       return res.status(401).json({ message: 'Unable to login' });
-//     }
-
-//     // Login successful, return a response with a success message and the token
-//     res.status(200).json({
-//       message: 'User logged in successfully',
-//       token: authorization.split(' ')[1] // Return the same token
-//     });
-//   } catch (error) {
-//     // If an error occurs during the login process, return an error response
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// };
 
 module.exports = { fetchUser, addUser, loginUser };
