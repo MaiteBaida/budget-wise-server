@@ -1,3 +1,5 @@
+//PREVIOUS CODE - 1ST VERSION
+
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
