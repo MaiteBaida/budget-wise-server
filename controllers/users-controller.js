@@ -1,6 +1,6 @@
-const knex = require('knex')(require('../knexfile'));
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const knex = require("knex")(require("../knexfile"));
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const { JWT_KEY } = process.env;
 
 //get list of users
@@ -15,94 +15,111 @@ const { JWT_KEY } = process.env;
 
 //get user by id function
 const fetchUser = async (req, res) => {
-    try {
-      const userId = await knex('users')
-        .where({ id: req.params.id });
-  
-      if (userId.length === 0) {
-        return res.status(404).json({
-          message: `User with ID ${req.params.id} not found`
-        });
-      }
-  
-      const userData = userId[0];
-      res.json(userData);
-    } catch (error) {
-      res.status(500).json({
-        message: `Unable to retrieve data for user with ID ${req.params.id}`,
+  try {
+    const userId = await knex("users").where({ id: req.params.id });
+
+    if (userId.length === 0) {
+      return res.status(404).json({
+        message: `User with ID ${req.params.id} not found`,
       });
     }
-}
+
+    const userData = userId[0];
+    res.json(userData);
+  } catch (error) {
+    res.status(500).json({
+      message: `Unable to retrieve data for user with ID ${req.params.id}`,
+    });
+  }
+};
 
 //add new user function
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const addUser = async (req, res) => {
-    const { username, email, password, first_name, last_name } = req.body;
+  const { username, email, password, first_name, last_name } = req.body;
 
-    if (!username || !email || !password || !first_name || !last_name) {
-        return res.status(400).json({
-            message: 'All fields are required',
-        })
-    }
-    if (!emailRegex.test(email)) { 
-        return res.status(400).json({
-            message: 'Invalid Email',
-        })
-    } 
-    try {
-      const hashedPassword = bcrypt.hashSync(password);
-      const result = await knex('users').insert({
-          username, 
-          email, 
-          password: hashedPassword, 
-          first_name, 
-          last_name,
-      })
+  if (!username || !email || !password || !first_name || !last_name) {
+    return res.status(400).json({
+      message: "All fields are required",
+    });
+  }
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      message: "Invalid Email",
+    });
+  }
+  try {
+    const hashedPassword = bcrypt.hashSync(password);
+    const result = await knex("users").insert({
+      username,
+      email,
+      password: hashedPassword,
+      first_name,
+      last_name,
+    });
 
-      const newUserId = result[0];
-      const createdUser = await knex('users').where({ id: newUserId }).first();
+    const newUserId = result[0];
+    const createdUser = await knex("users").where({ id: newUserId }).first();
 
-      res.status(201).json({
-          message: 'User created successfully',
-          user: createdUser,
-      })
+    const token = jwt.sign(
+      {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        username: username,
+      },
+      JWT_KEY
+    );
 
-    } catch (error) {
-        res.status(500).json({
-            message: `Unable to create new user: ${error}`,
-        })
-    }
-}
+    res.status(201).json({
+      message: "User created successfully",
+      user: createdUser,
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: `Unable to create new user: ${error}`,
+    });
+  }
+};
 
 //user loggin confirmation
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const user = await knex('users').where({ username: username }).first();
-  
-    if(!user) {
-      res.status(401).json({message:'Unable to login'});
+    const user = await knex("users").where({ username: username }).first();
+
+    if (!user) {
+      res.status(401).json({ message: "Unable to login" });
     }
 
     const isPasswordCorrect = bcrypt.compareSync(password, user.password);
-    if(!isPasswordCorrect) {
-      res.status(401).json({message:'Unable to login'});
+    if (!isPasswordCorrect) {
+      res.status(401).json({ message: "Unable to login" });
     }
-   
+
     const token = jwt.sign(
-      {first_name: user.first_name, last_name: user.last_name, email: user.email, username: username}, 
+      {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        username: username,
+      },
       JWT_KEY
-    )
+    );
 
-    return res.status(200).json(token);
-
+    return res.status(200).json({
+      message: "User logged in",
+      token,
+      user,
+    });
   } catch (error) {
-    console.error('Error signing JWT:', error);
-    res.status(401).json({message:'Unable to login'});
+    console.error("Error signing JWT:", error);
+    res.status(401).json({ message: "Unable to login" });
   }
-}
+};
 
 module.exports = { fetchUser, addUser, loginUser };
