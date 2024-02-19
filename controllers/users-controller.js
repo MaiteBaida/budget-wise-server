@@ -13,10 +13,18 @@ const { JWT_KEY } = process.env;
 //     }
 // }
 
-//get user by id function
+//get user by id function (token)
 const fetchUser = async (req, res) => {
   try {
-    const userId = await knex("users").where({ id: req.params.id });
+    const dataToReturn = [
+      "username",
+      "email",
+      "first_name",
+      "last_name",
+      "income",
+      "income_frequency",
+    ];
+    const userId = await knex("users").select().where({ id: req.user.id });
 
     if (userId.length === 0) {
       return res.status(404).json({
@@ -107,6 +115,7 @@ const loginUser = async (req, res) => {
         last_name: user.last_name,
         email: user.email,
         username: username,
+        id: user.id,
       },
       JWT_KEY
     );

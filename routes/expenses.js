@@ -4,8 +4,8 @@ const expensesController = require("../controllers/expenses-controller");
 const { authorize } = require("../middlewares/authorization");
 
 router
-  .get("/:userid/expenses", authorize, expensesController.userExpenses)
-  .post("/:userid/expenses", authorize, expensesController.addExpense)
-  .put("/expenses/:id", authorize, expensesController.addExpense);
+  .get("/", authorize, expensesController.userExpenses)
+  .post("/", authorize, expensesController.addExpense)
+  .put("/:id", authorize, expensesController.addExpense);
 
 module.exports = router;
