@@ -9,9 +9,9 @@ router
   .post("/", authorize, expensesController.addExpense)
   .put("/:id", authorize, expensesController.editExpense)
   .delete("/:id", authorize, expensesController.deleteExpense)
-  .get("/entries", authorize, entriesController.expensesEntries)
-  .post("/entries", authorize, entriesController.addEntry)
-  .put("/entries/:id", authorize, entriesController.editEntry)
-  .delete("/entries/:id", authorize, entriesController.editEntry);
+  .get("/:id/entries", authorize, entriesController.expensesEntries)
+  .post("/:id/entries", authorize, entriesController.addEntry)
+  .put("/:id/entries/:entryid", authorize, entriesController.editEntry)
+  .delete("/:id/entries/:entryid", authorize, entriesController.deleteEntry);
 
 module.exports = router;

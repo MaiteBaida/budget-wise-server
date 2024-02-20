@@ -3,8 +3,9 @@ const knex = require("knex")(require("../knexfile"));
 //get a list of all entries from a expense
 const expensesEntries = async (req, res) => {
   try {
-    const expenseId = req.expense.id;
-    const entries = await knex("entries").where("expenses_id", expenseId);
+    const expenseId = req.params.id;
+    console.log(expenseId);
+    const entries = await knex("entries").where("expense_id", expenseId);
 
     res.json(entries);
   } catch (error) {
@@ -17,33 +18,36 @@ const expensesEntries = async (req, res) => {
 //add a new entry
 const addEntry = async (req, res) => {
   try {
-    const { amount, notes } = req.body;
+    const { value, notes } = req.body;
 
-    if (!amount) {
-      return res.status(400).json({ message: "Must have an amount" });
+    if (!value) {
+      return res.status(400).json({ message: "Must have an value" });
     }
 
-    if (isNaN(amount)) {
-      return res.status(400).json({ message: "Amount must be a number" });
+    if (isNaN(value)) {
+      return res.status(400).json({ message: "value must be a number" });
     }
+
+    const timestamp = Date.now();
 
     const newEntry = {
-      amount,
+      value,
       notes,
-      timestamp,
-      expense_id: req.expense.id,
+      timestamp: timestamp,
+      expense_id: req.params.id,
       user_id: req.user.id,
     };
 
     const [entryId] = await knex("entries").insert(newEntry);
-    //timestamp ?
+
     const entry = await knex("entries").where("id", entryId).first();
 
     res.status(201).json({
       message: "Entry created successfully",
-      expense: expense,
+      entry: entry,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Failed to create entry" });
   }
 };
@@ -51,17 +55,17 @@ const addEntry = async (req, res) => {
 //edit entry
 const editEntry = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { entryid } = req.params;
 
-    const { amount, notes } = req.body;
+    const { value, notes } = req.body;
 
-    const existingEntry = await knex("entries").where("id", id).first();
+    const existingEntry = await knex("entries").where("id", entryid).first();
 
     if (!existingEntry) {
       return res.status(404).json({ message: "Entry not found" });
     }
 
-    if (!amount) {
+    if (!value) {
       return res
         .status(400)
         .json({ message: "Missing properties in the request body" });
@@ -75,16 +79,16 @@ const editEntry = async (req, res) => {
       return res.status(400).json({ message: "Expense does not exist" });
     }
 
-    if (isNaN(amount)) {
-      return res.status(400).json({ message: "Amount must be a number" });
+    if (isNaN(value)) {
+      return res.status(400).json({ message: "value must be a number" });
     }
 
-    await knex("entries").where("id", id).update({
-      amount,
+    await knex("entries").where("id", entryid).update({
+      value,
       notes,
     });
 
-    const updatedEntry = await knex("entry").where("id", id).first();
+    const updatedEntry = await knex("entries").where("id", entryid).first();
 
     res.status(200).json(updatedEntry);
   } catch (error) {
@@ -97,7 +101,7 @@ const editEntry = async (req, res) => {
 const deleteEntry = async (req, res) => {
   try {
     const rowsDeleted = await knex("entries")
-      .where({ id: req.params.id })
+      .where({ id: req.params.entryid })
       .delete();
 
     if (rowsDeleted === 0) {
