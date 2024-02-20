@@ -23,6 +23,10 @@ const addExpense = async (req, res) => {
       return res.status(400).json({ message: "Must fill in all fields" });
     }
 
+    if (isNaN(budget)) {
+      return res.status(400).json({ message: "Budget must be a number" });
+    }
+
     const newExpense = {
       name,
       budget,
@@ -40,7 +44,6 @@ const addExpense = async (req, res) => {
       expense: expense,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Failed to create expense" });
   }
 };
