@@ -17,7 +17,6 @@ app.route("/").get((_req, res) => {
 
 app.use("/users", usersRoutes);
 app.use("/expenses", expensesRoutes);
-// app.use("/expenses/:id/entries", entriesRoutes);
 
 const PORT = process.env.PORT || 8080;
 

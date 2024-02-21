@@ -1,8 +1,7 @@
-require('dotenv').config();
+require("dotenv").config();
 /**
  *no @type { Object.<string, import("knex").Knex.Config> }
  */
-console.log(process.env)
 module.exports = {
   client: "mysql2",
   connection: {

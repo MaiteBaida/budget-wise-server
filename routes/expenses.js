@@ -7,6 +7,7 @@ const { authorize } = require("../middlewares/authorization");
 router
   .get("/", authorize, expensesController.userExpenses)
   .post("/", authorize, expensesController.addExpense)
+  .get("/:id", authorize, expensesController.fetchExpense)
   .put("/:id", authorize, expensesController.editExpense)
   .delete("/:id", authorize, expensesController.deleteExpense)
   .get("/:id/entries", authorize, entriesController.expensesEntries)

@@ -7,7 +7,7 @@ const authorize = (req, res, next) => {
     const payload = jwt.verify(authorization, JWT_KEY);
     req.user = payload;
     next();
-  } catch (err) {
+  } catch (error) {
     return res.status(401).json("Not authorized");
   }
 };

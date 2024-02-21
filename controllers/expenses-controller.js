@@ -48,8 +48,32 @@ const addExpense = async (req, res) => {
   }
 };
 
-//edit expense
+//get expense by ID
 
+const fetchExpense = async (req, res) => {
+  try {
+    const dataToReturn = ["name", "budget", "frequency", "type"];
+
+    const expenseId = await knex("expenses")
+      .select()
+      .where({ id: req.expenses.id });
+
+    if (expenseId.length === 0) {
+      return res.status(404).json({
+        message: `Expense with ID ${req.params.id} not found`,
+      });
+    }
+
+    const expenseData = expenseId[0];
+    res.json(expenseData);
+  } catch (error) {
+    res.status(500).json({
+      message: `Unable to retrieve data for expense with ID ${req.params.id}`,
+    });
+  }
+};
+
+//edit expense
 const editExpense = async (req, res) => {
   try {
     const { id } = req.params;
@@ -114,4 +138,10 @@ const deleteExpense = async (req, res) => {
   }
 };
 
-module.exports = { userExpenses, addExpense, editExpense, deleteExpense };
+module.exports = {
+  userExpenses,
+  addExpense,
+  fetchExpense,
+  editExpense,
+  deleteExpense,
+};

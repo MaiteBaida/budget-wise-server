@@ -4,7 +4,6 @@ const knex = require("knex")(require("../knexfile"));
 const expensesEntries = async (req, res) => {
   try {
     const expenseId = req.params.id;
-    console.log(expenseId);
     const entries = await knex("entries").where("expense_id", expenseId);
 
     res.json(entries);
@@ -47,7 +46,6 @@ const addEntry = async (req, res) => {
       entry: entry,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Failed to create entry" });
   }
 };

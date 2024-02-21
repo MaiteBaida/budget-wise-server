@@ -3,15 +3,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_KEY } = process.env;
 
-//get list of users
+// get list of users
 // const fetchUsersList = async (_req, res) => {
 //   try {
-//     const usersList = await knex.select().from('users');
+//     const usersList = await knex.select().from("users");
 //     res.status(200).json(usersList);
-//     } catch (error) {
-//         res.status(400).json({ message: 'Error retrieving users', error });
-//     }
-// }
+//   } catch (error) {
+//     res.status(400).json({ message: "Error retrieving users", error });
+//   }
+// };
 
 //get user by id function (token)
 const fetchUser = async (req, res) => {
@@ -24,6 +24,7 @@ const fetchUser = async (req, res) => {
       "income",
       "income_frequency",
     ];
+
     const userId = await knex("users").select().where({ id: req.user.id });
 
     if (userId.length === 0) {
@@ -73,10 +74,11 @@ const addUser = async (req, res) => {
 
     const token = jwt.sign(
       {
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
+        first_name: createdUser.first_name,
+        last_name: createdUser.last_name,
+        email: createdUser.email,
         username: username,
+        id: createdUser.id,
       },
       JWT_KEY
     );
