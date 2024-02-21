@@ -92,24 +92,21 @@ const editExpense = async (req, res) => {
         .json({ message: "Missing properties in the request body" });
     }
 
-    const existingUser = await knex("users")
-      .where("id", existingExpense.user_id)
-      .first();
-
-    if (!existingUser) {
-      return res.status(400).json({ message: "User does not exist" });
-    }
-
     if (isNaN(budget)) {
       return res.status(400).json({ message: "Budget must be a number" });
     }
 
-    await knex("expenses").where("id", id).update({
+    const updateObject = {
       name,
       budget,
-      frequency,
       type,
-    });
+    };
+
+    if (frequency) {
+      updateObject.frequency = frequency;
+    }
+
+    await knex("expenses").where("id", id).update(updateObject);
 
     const updatedExpense = await knex("expenses").where("id", id).first();
 
