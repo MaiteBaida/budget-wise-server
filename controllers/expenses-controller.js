@@ -56,7 +56,7 @@ const fetchExpense = async (req, res) => {
 
     const expenseId = await knex("expenses")
       .select()
-      .where({ id: req.expenses.id });
+      .where({ id: req.params.id });
 
     if (expenseId.length === 0) {
       return res.status(404).json({
