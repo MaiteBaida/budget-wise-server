@@ -113,4 +113,27 @@ const deleteEntry = async (req, res) => {
   }
 };
 
-module.exports = { expensesEntries, addEntry, editEntry, deleteEntry };
+//get entry by id
+const fetchEntry = async (req, res) => {
+  try {
+    const entryId = req.params.entryId;
+    const entry = await entry.findById(entryId);
+    if (!entry) {
+      return res
+        .status(404)
+        .json({ message: `Entry with ID ${entryId} not found` });
+    }
+    res.json(entry);
+  } catch (error) {
+    console.error("Error fetching entry:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  expensesEntries,
+  addEntry,
+  editEntry,
+  deleteEntry,
+  fetchEntry,
+};

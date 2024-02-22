@@ -12,6 +12,7 @@ router
   .delete("/:id", authorize, expensesController.deleteExpense)
   .get("/:id/entries", authorize, entriesController.expensesEntries)
   .post("/:id/entries", authorize, entriesController.addEntry)
+  .get("/:id/entries/:entryid", authorize, entriesController.fetchEntry)
   .put("/:id/entries/:entryid", authorize, entriesController.editEntry)
   .delete("/:id/entries/:entryid", authorize, entriesController.deleteEntry);
 
