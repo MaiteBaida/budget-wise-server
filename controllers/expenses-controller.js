@@ -1,10 +1,33 @@
 const knex = require("knex")(require("../knexfile"));
 
 //GET list of user's expenses
+// const userExpenses = async (req, res) => {
+//   try {
+//     const userId = req.user.id;
+//     const expenses = await knex("expenses").where("user_id", userId);
+
+//     const entriesByExpene = await knex("entries").where("expense_id", userId);
+
+//     res.json(expenses);
+//   } catch (error) {
+//     res.status(500).json({
+//       message: `Error retrieving expenses for user: ${error}`,
+//     });
+//   }
+// };
+
 const userExpenses = async (req, res) => {
   try {
     const userId = req.user.id;
-    const expenses = await knex("expenses").where("user_id", userId);
+
+    const expenses = await knex("expenses").select().where("user_id", userId);
+
+    for (const expense of expenses) {
+      const entries = await knex("entries")
+        .select()
+        .where("expense_id", expense.id);
+      expense.entries = entries;
+    }
 
     res.json(expenses);
   } catch (error) {
@@ -52,8 +75,6 @@ const addExpense = async (req, res) => {
 
 const fetchExpense = async (req, res) => {
   try {
-    const dataToReturn = ["name", "budget", "frequency", "type"];
-
     const expenseId = await knex("expenses")
       .select()
       .where({ id: req.params.id });

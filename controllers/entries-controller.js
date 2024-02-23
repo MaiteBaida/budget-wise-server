@@ -7,6 +7,7 @@ const expensesEntries = async (req, res) => {
     const entries = await knex("entries").where("expense_id", expenseId);
 
     res.json(entries);
+    console.log(entries);
   } catch (error) {
     res.status(500).json({
       message: `Error retrieving entries for expenses: ${error}`,
@@ -116,8 +117,9 @@ const deleteEntry = async (req, res) => {
 //get entry by id
 const fetchEntry = async (req, res) => {
   try {
-    const entryId = req.params.entryId;
-    const entry = await entry.findById(entryId);
+    const entryId = req.params.entryid;
+
+    const entry = await knex("entries").select().where({ id: entryId }).first();
     if (!entry) {
       return res
         .status(404)
