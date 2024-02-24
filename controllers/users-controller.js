@@ -16,26 +16,28 @@ const { JWT_KEY } = process.env;
 //get user by id function (token)
 const fetchUser = async (req, res) => {
   try {
-    const dataToReturn = [
-      "username",
-      "email",
-      "first_name",
-      "last_name",
-      "income",
-      "income_frequency",
-    ];
+    console.log(req.user.id);
+    const userData = await knex("users")
+      .select()
+      .where({ id: req.user.id })
+      .first();
+    const userTotalEntries = await knex("entries")
+      .sum("value as user_total")
+      .where("user_id", req.user.id)
+      .first()
+      .then((res) => {
+        return res.user_total;
+      });
 
-    const userId = await knex("users").select().where({ id: req.user.id });
-
-    if (userId.length === 0) {
+    if (!userData) {
       return res.status(404).json({
         message: `User with ID ${req.params.id} not found`,
       });
     }
 
-    const userData = userId[0];
-    res.json(userData);
+    res.json({ ...userData, userTotalEntries });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: `Unable to retrieve data for user with ID ${req.params.id}`,
     });
