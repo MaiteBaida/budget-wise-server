@@ -1,26 +1,21 @@
 const knex = require("knex")(require("../knexfile"));
 
-//GET list of user's expenses
-// const userExpenses = async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-//     const expenses = await knex("expenses").where("user_id", userId);
-
-//     const entriesByExpene = await knex("entries").where("expense_id", userId);
-
-//     res.json(expenses);
-//   } catch (error) {
-//     res.status(500).json({
-//       message: `Error retrieving expenses for user: ${error}`,
-//     });
-//   }
-// };
-
 const userExpenses = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const expenses = await knex("expenses").select().where("user_id", userId);
+    const expenses = await knex("expenses")
+      .join(
+        knex
+          .select(knex.raw("SUM(value) AS total_entries, expense_id"))
+          .from("entries")
+          .where("user_id", userId)
+          .groupBy("expense_id")
+          .as("totals"),
+        "totals.expense_id",
+        "expenses.id"
+      )
+      .where("user_id", userId);
 
     for (const expense of expenses) {
       const entries = await knex("entries")

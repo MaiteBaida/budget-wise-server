@@ -16,13 +16,21 @@ const { JWT_KEY } = process.env;
 //get user by id function (token)
 const fetchUser = async (req, res) => {
   try {
-    console.log(req.user.id);
     const userData = await knex("users")
       .select()
       .where({ id: req.user.id })
       .first();
+
     const userTotalEntries = await knex("entries")
       .sum("value as user_total")
+      .where("user_id", req.user.id)
+      .first()
+      .then((res) => {
+        return res.user_total;
+      });
+
+    const userTotalBudget = await knex("expenses")
+      .sum("budget as user_total")
       .where("user_id", req.user.id)
       .first()
       .then((res) => {
@@ -35,7 +43,7 @@ const fetchUser = async (req, res) => {
       });
     }
 
-    res.json({ ...userData, userTotalEntries });
+    res.json({ ...userData, userTotalEntries, userTotalBudget });
   } catch (error) {
     console.log(error);
     res.status(500).json({
