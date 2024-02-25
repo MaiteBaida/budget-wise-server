@@ -16,7 +16,7 @@ const fetchUser = async (req, res) => {
       .where("user_id", req.user.id)
       .first()
       .then((res) => {
-        return res.user_total;
+        return parseFloat(res.user_total);
       });
 
     const userTotalBudget = await knex("expenses")
@@ -24,7 +24,7 @@ const fetchUser = async (req, res) => {
       .where("user_id", req.user.id)
       .first()
       .then((res) => {
-        return res.user_total;
+        return parseFloat(res.user_total);
       });
 
     if (!userData) {
@@ -97,11 +97,10 @@ const addUser = async (req, res) => {
 //user loggin confirmation
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
-  console.log(req.body);
+
   try {
-    console.log(username, password);
     const user = await knex("users").where({ username: username }).first();
-    console.log(user);
+
     if (!user) {
       res.status(401).json({ message: "Unable to login" });
     }

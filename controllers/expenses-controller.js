@@ -1,6 +1,6 @@
 const knex = require("knex")(require("../knexfile"));
 
-//get user's expenses including totals form entries
+//get user's expenses including totals from entries
 const userExpenses = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -23,6 +23,9 @@ const userExpenses = async (req, res) => {
         .select()
         .where("expense_id", expense.id);
       expense.entries = entries;
+
+      expense.budget = parseFloat(expense.budget);
+      expense.total_entries = parseFloat(expense.total_entries);
     }
 
     res.json(expenses);
