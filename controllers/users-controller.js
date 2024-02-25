@@ -3,17 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_KEY } = process.env;
 
-// get list of users
-// const fetchUsersList = async (_req, res) => {
-//   try {
-//     const usersList = await knex.select().from("users");
-//     res.status(200).json(usersList);
-//   } catch (error) {
-//     res.status(400).json({ message: "Error retrieving users", error });
-//   }
-// };
-
-//get user by id function (token)
+//get user including total entries and total total budget
 const fetchUser = async (req, res) => {
   try {
     const userData = await knex("users")
@@ -53,7 +43,6 @@ const fetchUser = async (req, res) => {
 };
 
 //add new user function
-
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const addUser = async (req, res) => {
@@ -108,10 +97,11 @@ const addUser = async (req, res) => {
 //user loggin confirmation
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
-
+  console.log(req.body);
   try {
+    console.log(username, password);
     const user = await knex("users").where({ username: username }).first();
-
+    console.log(user);
     if (!user) {
       res.status(401).json({ message: "Unable to login" });
     }
