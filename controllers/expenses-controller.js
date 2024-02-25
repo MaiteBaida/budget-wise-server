@@ -1,11 +1,12 @@
 const knex = require("knex")(require("../knexfile"));
 
+//get user's expenses including totals form entries
 const userExpenses = async (req, res) => {
   try {
     const userId = req.user.id;
 
     const expenses = await knex("expenses")
-      .join(
+      .leftJoin(
         knex
           .select(knex.raw("SUM(value) AS total_entries, expense_id"))
           .from("entries")
