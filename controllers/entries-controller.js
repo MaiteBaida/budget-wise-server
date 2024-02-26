@@ -7,7 +7,6 @@ const expensesEntries = async (req, res) => {
     const entries = await knex("entries").where("expense_id", expenseId);
 
     res.json(entries);
-    console.log(entries);
   } catch (error) {
     res.status(500).json({
       message: `Error retrieving entries for expenses: ${error}`,
