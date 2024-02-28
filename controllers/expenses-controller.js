@@ -140,6 +140,8 @@ const editExpense = async (req, res) => {
 //delete expense
 const deleteExpense = async (req, res) => {
   try {
+    await knex("entries").where({ expense_id: req.params.id }).delete();
+
     const rowsDeleted = await knex("expenses")
       .where({ id: req.params.id })
       .delete();
